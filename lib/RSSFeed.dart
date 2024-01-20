@@ -162,11 +162,37 @@ class RSSDemoState extends State<RSSDemo> {
           return Text("Error loading sentiment analysis");
         } else {
           Rating sentiment = snapshot.data!;
-          return Text(
-            DateFormat("dd/MM hh:mm ").format(date) +
-                "${sentiment.label.toLowerCase()}",
-            style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.w400),
-            maxLines: 1,
+          Color textColor;
+
+          switch (sentiment.label) {
+            case "POSITIVE":
+              textColor = Colors.green;
+              break;
+            case "NEGATIVE":
+              textColor = Colors.red;
+              break;
+            default:
+              textColor = Colors.black;
+          }
+          return RichText(
+            // thanks to chatGPT for telling me RichText and TextSpan exists, thanks flutter docs <3 https://api.flutter.dev/flutter/widgets/RichText-class.html
+            text: TextSpan(
+              text: DateFormat("dd/MM hh:mm ").format(date),
+              style: TextStyle(
+                fontSize: 13.0,
+                fontWeight: FontWeight.w400,
+                color: Colors.black,
+              ),
+              children: <TextSpan>[
+                TextSpan(
+                  text: "\n${sentiment.label.toLowerCase()}",
+                  style: TextStyle(
+                    color: textColor, // Use the color based on sentiment label
+                  ),
+                ),
+              ],
+            ),
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           );
         }
@@ -308,16 +334,14 @@ class RSSDemoState extends State<RSSDemo> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SettingsBloc, SettingsState>(
-      builder: (context, settingsState)
-    {
+        builder: (context, settingsState) {
       return Scaffold(
         appBar: AppBar(
           title: Text(_title),
         ),
         body: body(settingsState.settings),
       );
-    }
-    );
+    });
   }
 }
 
