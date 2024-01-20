@@ -43,7 +43,25 @@ def analyse():
     label, score = score[0]['label'], score[0]['score']
     return jsonify({ "label" : label, "score" : score })
 
-app.route('/scrape', methods=["POST"])
+@app.route('/analyse_batch', methods=["POST"])
+def analyse_batch():
+    if not request.is_json:
+        return jsonify({"error": "Request must be JSON"}), 422
+    data = request.json
+    texts = data.get("texts")
+    if not texts:
+        return jsonify({"error": "No texts provided"}), 422
+
+    res = []
+
+    texts = data["texts"]
+    for text in texts:
+        score = query_model(text)
+        label, score = score[0]['label'], score[0]['score']
+        res.append({ "label" : label, "score" : score })
+    return jsonify(res)
+
+@app.route('/scrape', methods=["POST"])
 def scrape():
     if not request.is_json:
         return jsonify({"error": "Request must be JSON"}), 400
