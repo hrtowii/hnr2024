@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 
 // TODO 2: Import packages we added to our pubspec.yaml file.
 import 'package:webfeed/webfeed.dart';
@@ -43,9 +43,9 @@ class RSSReaderState extends State<RSSReader> {
   static const String FEED_URL = 'https://hnrss.org/jobs';
 
   // TODO 4: Create a variable to hold our RSS feed data.
-  late RssFeed _feed; // RSS Feed Object
+  RssFeed _feed = {} as RssFeed; // RSS Feed Object
   // TODO 5: Create a place holder for our title.
-  late String _title; // Place holder for appbar title.
+  String _title = ""; // Place holder for appbar title.
 
   // TODO 6: Setup our notification messages.
   // Notification Strings
@@ -59,7 +59,7 @@ class RSSReaderState extends State<RSSReader> {
   // class and the GloablKey class.
   // https://api.flutter.dev/flutter/widgets/GlobalKey-class.html
   // https://api.flutter.dev/flutter/material/RefreshIndicatorState-class.html
-  GlobalKey<RefreshIndicatorState> _refreshKey;
+  late GlobalKey<RefreshIndicatorState> _refreshKey;
 
   // TODO 8: Create a method to update the user about data changes.
   // Method to change the title as a way to inform the user what is going on
@@ -228,7 +228,7 @@ class RSSReaderState extends State<RSSReader> {
                 padding: EdgeInsets.all(5.0),
                 itemCount: _feed.items?.length,
                 itemBuilder: (BuildContext context, int index) {
-                  final item = _feed.items[index];
+                  final item = _feed.items![index];
                   return Container(
                     margin: EdgeInsets.only(
                       bottom: 10.0,
