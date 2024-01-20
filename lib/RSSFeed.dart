@@ -1,6 +1,8 @@
 // import 'dart:io';
 // import 'dart:html';
 
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
@@ -199,42 +201,51 @@ class RSSDemoState extends State<RSSDemo> {
                   builder: (BuildContext context) {
                     return Padding(
                         padding: const EdgeInsets.all(20.0),
-                        child: SizedBox(
-                          height: 400,
-                          // color: Colors.amber,
-                          // child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              Align(
-                                  // aligns the text to top left
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    item.title ?? "Title not found...",
-                                    style: const TextStyle(
-                                        fontSize: 17.0,
-                                        fontWeight: FontWeight.w500),
-                                    maxLines: 4,
-                                    overflow: TextOverflow.ellipsis,
-                                  )),
-                              Text(
-                                description.news.isEmpty
-                                    ? item
-                                        .description! // fallback to RSS feed one if the server is dead
-                                    : description.news,
-                                style: const TextStyle(
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w300),
-                              ),
-                              const Spacer(),
-                              ElevatedButton(
-                                child: const Text('Close BottomSheet'),
-                                onPressed: () => Navigator.pop(context),
-                              ),
-                            ],
-                            // ),
+                        child: SingleChildScrollView(
+                          child: SizedBox(
+                            height: 600,
+                            // color: Colors.amber,
+                            // child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Align(
+                                    // aligns the text to top left
+                                    alignment: Alignment.topLeft,
+                                    child: Text(
+                                      item.title ?? "Title not found...",
+                                      style: const TextStyle(
+                                          fontSize: 18.0,
+                                          fontWeight: FontWeight.w600),
+                                      maxLines: 4,
+                                      overflow: TextOverflow.ellipsis,
+                                    )),
+                                Text(
+                                  description.news.isEmpty
+                                      ? item
+                                          .description! // fallback to RSS feed one if the server is dead
+                                      : description.news,
+                                  style: const TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                                const Spacer(),
+                                ElevatedButton(
+                                  child: const Text('Back'),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                                ElevatedButton(
+                                    child:
+                                        const Text('View article in browser'),
+                                    onPressed: () => {
+                                          openFeed(item.link!),
+                                          Navigator.pop(context),
+                                        }),
+                              ],
+                              // ),
+                            ),
                           ),
                         ));
                   });
@@ -280,10 +291,7 @@ class TextDescription {
       {
         'news': String news,
       } =>
-        TextDescription(
-            // id: id,
-            // title: title,
-            news: news),
+        TextDescription(news: news),
       _ => throw const FormatException('Failed to load textdescription.'),
     };
   }
@@ -303,6 +311,39 @@ class TextDescription {
           as Map<String, dynamic>); // chatgpt I LOVE YOU SO MUCH
     } else {
       throw Exception('Failed to create text description.');
+    }
+  }
+}
+
+// thx to YY
+class Rating {
+  final String label;
+  final double score;
+
+  Rating({required this.label, required this.score});
+
+  factory Rating.fromJson(Map<String, dynamic> json) {
+    return Rating(
+      label: json['label'] as String,
+      score: json['score'] as double,
+    );
+  }
+
+  Future<Rating> getRating(String input) async {
+    final response = await http.post(
+      Uri.parse('http://localhost:5000/analyse'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'text': input,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return Rating.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception();
     }
   }
 }
