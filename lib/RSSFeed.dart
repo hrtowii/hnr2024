@@ -33,8 +33,9 @@ class RSSDemoState extends State<RSSDemo> {
   //     'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss';
   // final Uri FEED_URL =
   //     Uri.https('nasa.gov', 'rss/dyn/lg_image_of_the_day.rss', {'limit': '10'});
-  final Uri FEED_URL = Uri.https('nyaa.si', 'page?=rss', {'limit': '10'});
-  // Uri.https('reddit.com', 'r/jailbreak.rss', {'limit': '10'});
+  // https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6511
+  final Uri FEED_URL = Uri.https('channelnewsasia.com',
+      'api/v1/rss-outbound-feed?_format=xml&category=6511', {'limit': '10'});
   RssFeed _feed = RssFeed();
   String _title = "";
   static const String loadingFeedMsg = 'Loading Feed...';
@@ -48,7 +49,7 @@ class RSSDemoState extends State<RSSDemo> {
       if (_title != String) {
         _title = "Not found";
       }
-      _title = "title";
+      _title = title;
     });
   }
 
@@ -123,7 +124,7 @@ class RSSDemoState extends State<RSSDemo> {
   }
 
   subtitle(subTitle) {
-    if (subTitle == null) {
+    if (subTitle != String) {
       return Text("Subtitle not found");
     }
     return Text(
@@ -177,8 +178,9 @@ class RSSDemoState extends State<RSSDemo> {
         final item = _feed.items![index];
         return ListTile(
           title: title(item.title),
-          subtitle: subtitle(_feed.description),
-          leading: thumbnail(_feed.image?.url),
+          subtitle: subtitle(item.description),
+          leading: thumbnail(item.media!.thumbnails!.first
+              .url), // wtf man... why is this like this...
           trailing: rightIcon(),
           contentPadding: EdgeInsets.all(5.0),
           onTap: () => openFeed(item.link!),
