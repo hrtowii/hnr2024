@@ -177,28 +177,30 @@ class RSSDemoState extends State<RSSDemo> {
               emoji = "😐";
               textColor = Colors.black;
           }
-          if (true && sentiment.score <= 0.85 && sentiment.label.toLowerCase() != "negative") {
+          if (true &&
+              sentiment.score <= 0.85 &&
+              sentiment.label.toLowerCase() != "negative") {
             return RichText(
               text: TextSpan(
-              text: DateFormat("dd/MM hh:mm ").format(date),
-              style: TextStyle(
-                fontSize: 13.0,
-                fontWeight: FontWeight.w400,
-                color: Colors.black,
-              ),
-              children: <TextSpan>[
-                TextSpan(
-                  text: "\n${emoji + sentiment.label.toLowerCase()}" +
-                      ", ${(sentiment.score.toDouble() * 100).toStringAsFixed(2)}% sure",
-                  style: TextStyle(
-                    color: textColor,
-                  ),
+                text: DateFormat("dd/MM hh:mm ").format(date),
+                style: TextStyle(
+                  fontSize: 13.0,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black,
                 ),
-              ],
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          );
+                children: <TextSpan>[
+                  TextSpan(
+                    text: "\n${emoji + sentiment.label.toLowerCase()}" +
+                        ", ${(sentiment.score.toDouble() * 100).toStringAsFixed(2)}% sure",
+                    style: TextStyle(
+                      color: textColor,
+                    ),
+                  ),
+                ],
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            );
           } else {
             return Container();
           }
@@ -265,81 +267,105 @@ class RSSDemoState extends State<RSSDemo> {
     );
   }
 
+  Future<dynamic> fetchSentiments(item) async {
+    try {
+      var realdescription =
+          await TextDescription.createTextDescription(item.link!);
+      return await Rating.getRating(realdescription.news);
+    } catch (error) {
+      // Handle the error as needed
+      print("Error loading description: $error");
+      return TextDescription(news: "Error loading description");
+    }
+  }
+
   list(Map<String, Object> settings) {
     // check whether the feed should load the article or not
     // if (settings["sentimentalMinimum"]) {
     //
     // }
+    
     return ListView.builder(
       itemCount: _feed.items?.length,
       itemBuilder: (BuildContext context, int index) {
         final item = _feed.items![index];
-        return ListTile(
-            title: title(item.title),
-            subtitle: date(item.pubDate!,
-                item), // TODO: add a sentiment analysis call to the api, assigning an image / color coded text
-            leading: thumbnail(item.media!.thumbnails!.first
-                .url), // wtf man... why is this like this...
-            trailing: rightIcon(),
-            contentPadding: EdgeInsets.all(5.0),
-            // onTap: () => openFeed(item.link!),
-            onTap: () async {
-              TextDescription description =
-                  await TextDescription.createTextDescription(item.link!);
-              // TODO: move this to RSSModal.dart
-              showModalBottomSheet<void>(
-                  // I have no idea how this thing fucking works, but this is from asking chatgpt and relying on flutter docs https://docs.flutter.dev/cookbook/networking/send-data
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: SingleChildScrollView(
-                          child: SizedBox(
-                            height: 600,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Align(
-                                    // aligns the text to top left
-                                    alignment: Alignment.topLeft,
-                                    child: Text(
-                                      item.title ?? "Title not found...",
-                                      style: const TextStyle(
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.w600),
-                                      maxLines: 4,
-                                      overflow: TextOverflow.ellipsis,
-                                    )),
-                                Text(
-                                  description.news.isEmpty
-                                      ? item
-                                          .description! // fallback to RSS feed one if the server is dead
-                                      : description.news,
-                                  style: const TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.w400),
+        return FutureBuilder<dynamic>(
+        future: fetchSentiments(item),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator(); // or a loading indicator
+          } else if (snapshot.hasError) {
+            return Text('Error loading sentiment analysis: ${snapshot.error}');
+          } else if (snapshot.hasData) {
+            Rating sentiment = snapshot.data!;
+              if (sentiment.score <= 0.85 && sentiment.label.toLowerCase() != "negative") {
+              return ListTile(
+                  title: title(item.title),
+                  subtitle: date(item.pubDate!,
+                      item), // TODO: add a sentiment analysis call to the api, assigning an image / color coded text
+                  leading: thumbnail(item.media!.thumbnails!.first
+                      .url), // wtf man... why is this like this...
+                  trailing: rightIcon(),
+                  contentPadding: EdgeInsets.all(5.0),
+                  // onTap: () => openFeed(item.link!),
+                  onTap: () async {
+                    TextDescription description =
+                        await TextDescription.createTextDescription(item.link!);
+                    // TODO: move this to RSSModal.dart
+                    showModalBottomSheet<void>(
+                        // I have no idea how this thing fucking works, but this is from asking chatgpt and relying on flutter docs https://docs.flutter.dev/cookbook/networking/send-data
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: SingleChildScrollView(
+                                child: SizedBox(
+                                  height: 600,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Align(
+                                          // aligns the text to top left
+                                          alignment: Alignment.topLeft,
+                                          child: Text(
+                                            item.title ?? "Title not found...",
+                                            style: const TextStyle(
+                                                fontSize: 18.0,
+                                                fontWeight: FontWeight.w600),
+                                            maxLines: 4,
+                                            overflow: TextOverflow.ellipsis,
+                                          )),
+                                      Text(
+                                        description.news.isEmpty
+                                            ? item
+                                                .description! // fallback to RSS feed one if the server is dead
+                                            : description.news,
+                                        style: const TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      const Spacer(),
+                                      ElevatedButton(
+                                        child: const Text('Back'),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                      ElevatedButton(
+                                          child:
+                                              const Text('View article in browser'),
+                                          onPressed: () => {
+                                                openFeed(item.link!),
+                                                Navigator.pop(context),
+                                              }),
+                                    ],
+                                    // ),
+                                  ),
                                 ),
-                                const Spacer(),
-                                ElevatedButton(
-                                  child: const Text('Back'),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
-                                ElevatedButton(
-                                    child:
-                                        const Text('View article in browser'),
-                                    onPressed: () => {
-                                          openFeed(item.link!),
-                                          Navigator.pop(context),
-                                        }),
-                              ],
-                              // ),
-                            ),
-                          ),
-                        ));
+                              ));
+                        });
                   });
-            });
+        }
       },
     );
   }
