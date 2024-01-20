@@ -99,15 +99,7 @@ class RSSDemoState extends State<RSSDemo> {
     try {
       final client = http.Client();
       final response = await client.get(FEED_URL as Uri);
-      // print(RssFeed.parse(response.body));
       final object = RssFeed.parse(response.body);
-      // if (response.statusCode == 200) {
-      //   final object = XmlDocument.parse(response.body);
-      //   printXmlElement(object.rootElement!);
-      // } else {
-      //   print('Failed to fetch data: ${response.statusCode}');
-      // }
-      // sleep(Duration(seconds: 2));
       return object;
     } catch (e) {
       print(e);
@@ -135,13 +127,50 @@ class RSSDemoState extends State<RSSDemo> {
     );
   }
 
-  Description(description) {
-    return Text(
-      // description,
-      DateFormat("yyyy-MM-dd hh:mm:ss").format(description),
-      style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.w400),
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
+  // date(DateTime date, RssItem item) {
+  //   TextDescription actualDescription =
+  //       TextDescription.createTextDescription(item.link!);
+  //   Rating sentimentAnalysis = Rating.getRating(actualDescription.news);
+  //   print(sentimentAnalysis.label);
+  //   return Text(
+  //     // description,
+  //     DateFormat("yyyy-MM-dd hh:mm:ss").format(date),
+  //     style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.w400),
+  //     maxLines: 1,
+  //     overflow: TextOverflow.ellipsis,
+  //   );
+  // }
+  date(DateTime date, RssItem item) {
+    Future<dynamic> fetchSentiments() async {
+      try {
+        var realdescription =
+            await TextDescription.createTextDescription(item.link!);
+        return await Rating.getRating(realdescription.news);
+      } catch (error) {
+        // Handle the error as needed
+        print("Error loading description: $error");
+        return TextDescription(news: "Error loading description");
+      }
+    }
+
+    return FutureBuilder<dynamic>(
+      future: fetchSentiments(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Text("Loading..."); // or a loading indicator
+        } else if (snapshot.hasError) {
+          return Text("Error loading sentiment analysis");
+        } else {
+          Rating sentiment = snapshot.data!;
+          return Text(
+            DateFormat("dd/MM hh:mm ").format(date) +
+                "${sentiment.label.toLowerCase()}",
+            style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.w400),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          );
+        }
+      },
     );
   }
 
@@ -192,7 +221,8 @@ class RSSDemoState extends State<RSSDemo> {
         final item = _feed.items![index];
         return ListTile(
             title: title(item.title),
-            subtitle: Description(item.pubDate),
+            subtitle: date(item.pubDate!,
+                item), // TODO: add a sentiment analysis call to the api, assigning an image / color coded text
             leading: thumbnail(item.media!.thumbnails!.first
                 .url), // wtf man... why is this like this...
             trailing: rightIcon(),
@@ -211,8 +241,6 @@ class RSSDemoState extends State<RSSDemo> {
                         child: SingleChildScrollView(
                           child: SizedBox(
                             height: 600,
-                            // color: Colors.amber,
-                            // child: Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,7 +369,7 @@ class Rating {
     );
   }
 
-  Future<Rating> getRating(String input) async {
+  static Future<Rating> getRating(String input) async {
     final response = await http.post(
       Uri.parse('http://localhost:5000/analyse'),
       headers: <String, String>{
