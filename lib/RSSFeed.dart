@@ -5,6 +5,7 @@
 
 import 'dart:convert';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 // import 'package:webfeed/domain/media/description.dart';
 import 'package:xml/xml.dart';
@@ -13,6 +14,8 @@ import 'package:webfeed/webfeed.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
+import 'bloc/bloc.dart';
 // import 'dart:developer';
 
 void printXmlElement(XmlElement element, [String indent = '  ']) {
@@ -178,7 +181,11 @@ class RSSDemoState extends State<RSSDemo> {
     );
   }
 
-  list() {
+  list(Map<String, Object> settings) {
+    // check whether the feed should load the article or not
+    // if (settings["sentimentalMinimum"]) {
+    //
+    // }
     return ListView.builder(
       itemCount: _feed.items?.length,
       itemBuilder: (BuildContext context, int index) {
@@ -258,25 +265,30 @@ class RSSDemoState extends State<RSSDemo> {
     return null == _feed || null == _feed.items;
   }
 
-  body() {
+  body(Map<String, Object> settings) {
     return isFeedEmpty()
         ? Center(
             child: CircularProgressIndicator(),
           )
         : RefreshIndicator(
             key: _refreshKey,
-            child: list(),
+            child: list(settings),
             onRefresh: () => load(),
           );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_title),
-      ),
-      body: body(),
+    return BlocBuilder<SettingsBloc, SettingsState>(
+      builder: (context, settingsState)
+    {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(_title),
+        ),
+        body: body(settingsState.settings),
+      );
+    }
     );
   }
 }
