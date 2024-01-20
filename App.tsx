@@ -1,23 +1,16 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import {Redirect} from "expo-router";
 
-import React, { Component } from 'react';
-// import {
-//   ViroScene,
-//   ViroText,
-//   Viro360Image,
-//   ViroARSceneNavigator,
-// } from '@viro-community/react-viro';
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <Text>Open up App.tsx to start working on your app!</Text>
+      <StatusBar style="auto" />
+    </View>
+  );
+}
 
-var styles = StyleSheet.create({
-  helloWorldTextStyle: {
-    fontFamily: 'Arial',
-    fontSize: 60,
-    color: '#ffffff',
-    textAlignVertical: 'center',
-    textAlign: 'center',  
-  },
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -25,14 +18,3 @@ var styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
-export default function App() {
-  return <></>
-}
-
-// const myScene = () => (
-//   <ViroScene>
-//     <Viro360Image source={require('./assets/amongus.png')} />
-//     <ViroText text="Hello World!" position={[0, 0, -2]} style={styles.helloWorldTextStyle} />
-//   </ViroScene>
-// );

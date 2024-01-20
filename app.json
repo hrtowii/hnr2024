@@ -2,7 +2,6 @@
   "expo": {
     "name": "hnr2024",
     "slug": "hnr2024",
-    "scheme": "your-app-scheme",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,15 +15,13 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.htrowii.hnr2024"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.htrowii.hnr2024"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
