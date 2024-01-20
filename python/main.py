@@ -36,7 +36,6 @@ def analyse():
     if not text:
         return jsonify({"error": "No text provided"}), 400
 
-    print(data)
     text = data["text"]
 
     score = query_model(text)
@@ -75,25 +74,16 @@ def scrape():
         return jsonify({"error": "Not valid URL"}), 400
 
     try:
-        # Fetch the webpage content
         page = urllib.request.urlopen(url)
         bbytes = page.read()
-
-        # Parse HTML content using BeautifulSoup
         soup = BeautifulSoup(bbytes.decode("utf8"), "html.parser")
-
-        # Find elements with classes 'text' and 'text-long' and extract all <p> tags
+        # check for elements containing text -> text-long nested beneath
         relevant_elements = soup.find_all(class_=['text', 'text-long'])
         paragraphs = []
 
         for element in relevant_elements:
-            # Extract text from <p> tags within the identified elements
-            paragraphs.extend(element.find_all('p'))
-
-        # Combine text from identified <p> tags
+            paragraphs.extend(element.find_all('p')) # extract all <p> tags, then add the first 100 words to a list and return that.
         news_text = ' '.join([paragraph.get_text() for paragraph in paragraphs])
-
-        # Shorten the text to 100 words
         shortened_text = ' '.join(news_text.split()[:100])
 
         return jsonify({"news": shortened_text})

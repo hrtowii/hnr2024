@@ -131,9 +131,6 @@ class RSSDemoState extends State<RSSDemo> {
   }
 
   Description(description) {
-    // if (description != String) {
-    //   return Text("Subtitle not found");
-    // }
     return Text(
       // description,
       DateFormat("yyyy-MM-dd hh:mm:ss").format(description),
@@ -197,6 +194,7 @@ class RSSDemoState extends State<RSSDemo> {
                   await TextDescription.createTextDescription(item.link!);
               // TODO: move this to RSSModal.dart
               showModalBottomSheet<void>(
+                  // I have no idea how this thing fucking works, but this is from asking chatgpt and relying on flutter docs https://docs.flutter.dev/cookbook/networking/send-data
                   context: context,
                   builder: (BuildContext context) {
                     return Padding(
@@ -223,12 +221,12 @@ class RSSDemoState extends State<RSSDemo> {
                                   )),
                               Text(
                                 description.news.isEmpty
-                                    ? 'Fucks sake'
+                                    ? item
+                                        .description! // fallback to RSS feed one if the server is dead
                                     : description.news,
                                 style: const TextStyle(
                                     fontSize: 12.0,
                                     fontWeight: FontWeight.w300),
-                                // overflow: TextOverflow.ellipsis,
                               ),
                               const Spacer(),
                               ElevatedButton(
@@ -301,14 +299,9 @@ class TextDescription {
     );
 
     if (response.statusCode == 200) {
-      // If the server did return a 201 CREATED response,
-      // then parse the JSON.
-      print((TextDescription.fromJson(jsonDecode(response.body))));
-      return TextDescription.fromJson(
-          jsonDecode(response.body) as Map<String, dynamic>);
+      return TextDescription.fromJson(jsonDecode(response.body)
+          as Map<String, dynamic>); // chatgpt I LOVE YOU SO MUCH
     } else {
-      // If the server did not return a 201 CREATED response,
-      // then throw an exception.
       throw Exception('Failed to create text description.');
     }
   }
