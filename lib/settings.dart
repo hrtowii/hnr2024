@@ -1,4 +1,3 @@
-
 // Use BlocBuilder to consume the bloc
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +12,6 @@ class Settings extends StatefulWidget {
 }
 
 class _Settings extends State<Settings> {
-
   List<Feed> selectedFeeds = [];
   @override
   Widget build(BuildContext context) {
@@ -28,17 +26,17 @@ class _Settings extends State<Settings> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: Feed.values
                   .map((feed) => FeedCheckbox(
-                feed: feed,
-                onChanged: (value) {
-                  setState(() {
-                    if (value!) {
-                      selectedFeeds.add(feed);
-                    } else {
-                      selectedFeeds.remove(feed);
-                    }
-                  });
-                },
-              ))
+                        feed: feed,
+                        onChanged: (value) {
+                          setState(() {
+                            if (value!) {
+                              selectedFeeds.add(feed);
+                            } else {
+                              selectedFeeds.remove(feed);
+                            }
+                          });
+                        },
+                      ))
                   .toList(),
               // children: <Widget>[
               //   Text(
