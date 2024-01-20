@@ -1,6 +1,8 @@
 // import 'dart:io';
 // import 'dart:html';
 
+import 'dart:convert';
+
 import 'package:intl/intl.dart';
 // import 'package:webfeed/domain/media/description.dart';
 import 'package:xml/xml.dart';
@@ -218,7 +220,19 @@ class RSSDemoState extends State<RSSDemo> {
                                       )),
                                   Text(
                                     item.description!.isEmpty
-                                        ? "Description not found" //TODO: await description from our API (localhost:5000/scrape with url as route.)
+                                        ? TextDescription.fromJson(jsonDecode(
+                                                http.post(
+                                                    Uri.parse(
+                                                        'http://localhost:5000/scrape'),
+                                                    headers: <String, String>{
+                                                      'Content-Type':
+                                                          'application/json; charset=UTF-8',
+                                                    },
+                                                    body: jsonEncode(<String,
+                                                        String>{
+                                                      'url': item.link!,
+                                                    }))))
+                                            .title //TODO: await description from our API (localhost:5000/scrape with url as route.)
                                         : item.description!,
                                     style: const TextStyle(
                                         fontSize: 12.0,
@@ -264,5 +278,26 @@ class RSSDemoState extends State<RSSDemo> {
       ),
       body: body(),
     );
+  }
+}
+
+class TextDescription {
+  final int id;
+  final String title;
+
+  const TextDescription({required this.id, required this.title});
+
+  factory TextDescription.fromJson(Map<String, dynamic> json) {
+    return switch (json) {
+      {
+        'id': int id,
+        'title': String title,
+      } =>
+        TextDescription(
+          id: id,
+          title: title,
+        ),
+      _ => throw const FormatException('Failed to load textdescription.'),
+    };
   }
 }
