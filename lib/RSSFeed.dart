@@ -157,9 +157,9 @@ class RSSDemoState extends State<RSSDemo> {
       future: fetchSentiments(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Text("Loading..."); // or a loading indicator
+          return const Text("Loading..."); // or a loading indicator
         } else if (snapshot.hasError) {
-          return Text("Error loading sentiment analysis");
+          return const Text("Error loading sentiment analysis");
         } else {
           Rating sentiment = snapshot.data!;
           Color textColor;
@@ -177,9 +177,9 @@ class RSSDemoState extends State<RSSDemo> {
               emoji = "😐";
               textColor = Colors.black;
           }
-          return RichText(
-            // thanks to chatGPT for telling me RichText and TextSpan exists, thanks flutter docs <3 https://api.flutter.dev/flutter/widgets/RichText-class.html
-            text: TextSpan(
+          if (true && sentiment.score <= 0.85 && sentiment.label.toLowerCase() != "negative") {
+            return RichText(
+              text: TextSpan(
               text: DateFormat("dd/MM hh:mm ").format(date),
               style: TextStyle(
                 fontSize: 13.0,
@@ -199,6 +199,31 @@ class RSSDemoState extends State<RSSDemo> {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           );
+          } else {
+            return Container();
+          }
+          // return RichText(
+          //   // thanks to chatGPT for telling me RichText and TextSpan exists, thanks flutter docs <3 https://api.flutter.dev/flutter/widgets/RichText-class.html
+          //   text: TextSpan(
+          //     text: DateFormat("dd/MM hh:mm ").format(date),
+          //     style: TextStyle(
+          //       fontSize: 13.0,
+          //       fontWeight: FontWeight.w400,
+          //       color: Colors.black,
+          //     ),
+          //     children: <TextSpan>[
+          //       TextSpan(
+          //         text: "\n${emoji + sentiment.label.toLowerCase()}" +
+          //             ", ${(sentiment.score.toDouble() * 100).toStringAsFixed(2)}% sure",
+          //         style: TextStyle(
+          //           color: textColor,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          //   maxLines: 2,
+          //   overflow: TextOverflow.ellipsis,
+          // );
         }
       },
     );
