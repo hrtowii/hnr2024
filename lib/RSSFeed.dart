@@ -1,13 +1,13 @@
-import 'dart:io';
+// import 'dart:io';
 import 'package:intl/intl.dart';
-import 'package:webfeed/domain/media/description.dart';
+// import 'package:webfeed/domain/media/description.dart';
 import 'package:xml/xml.dart';
 import 'package:flutter/material.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'dart:developer';
+// import 'dart:developer';
 
 void printXmlElement(XmlElement element, [String indent = '  ']) {
   print('$indent${element.name}: ${element.text.trim()}');
@@ -91,12 +91,12 @@ class RSSDemoState extends State<RSSDemo> {
       final response = await client.get(FEED_URL as Uri);
       // print(RssFeed.parse(response.body));
       final object = RssFeed.parse(response.body);
-      if (response.statusCode == 200) {
-        final object = XmlDocument.parse(response.body);
-        printXmlElement(object.rootElement!);
-      } else {
-        print('Failed to fetch data: ${response.statusCode}');
-      }
+      // if (response.statusCode == 200) {
+      //   final object = XmlDocument.parse(response.body);
+      //   printXmlElement(object.rootElement!);
+      // } else {
+      //   print('Failed to fetch data: ${response.statusCode}');
+      // }
       // sleep(Duration(seconds: 2));
       return object;
     } catch (e) {
@@ -180,14 +180,36 @@ class RSSDemoState extends State<RSSDemo> {
       itemBuilder: (BuildContext context, int index) {
         final item = _feed.items![index];
         return ListTile(
-          title: title(item.title),
-          subtitle: Description(item.pubDate),
-          leading: thumbnail(item.media!.thumbnails!.first
-              .url), // wtf man... why is this like this...
-          trailing: rightIcon(),
-          contentPadding: EdgeInsets.all(5.0),
-          onTap: () => openFeed(item.link!),
-        );
+            title: title(item.title),
+            subtitle: Description(item.pubDate),
+            leading: thumbnail(item.media!.thumbnails!.first
+                .url), // wtf man... why is this like this...
+            trailing: rightIcon(),
+            contentPadding: EdgeInsets.all(5.0),
+            // onTap: () => openFeed(item.link!),
+            onTap: () => {
+                  showModalBottomSheet<void>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Container(
+                          height: 200,
+                          // color: Colors.amber,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                const Text('Modal BottomSheet'),
+                                ElevatedButton(
+                                  child: const Text('Close BottomSheet'),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      })
+                });
       },
     );
   }
