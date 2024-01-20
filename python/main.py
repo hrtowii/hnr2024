@@ -63,20 +63,43 @@ def analyse_batch():
 
 @app.route('/scrape', methods=["POST"])
 def scrape():
+    headers = {'User-Agent': 'Mozilla/5.0'}
+
     if not request.is_json:
         return jsonify({"error": "Request must be JSON"}), 400
 
     data = request.json
     url = data.get("url")
+
     if not url or not urlparse(url):
         return jsonify({"error": "Not valid URL"}), 400
 
-    page = urllib.request.urlopen(data["url"])
-    bbytes = page.read()
+    try:
+        # Fetch the webpage content
+        page = urllib.request.urlopen(url)
+        bbytes = page.read()
 
-    soup = BeautifulSoup(bbytes.decode("utf8"), "html.parser")
+        # Parse HTML content using BeautifulSoup
+        soup = BeautifulSoup(bbytes.decode("utf8"), "html.parser")
 
-    return soup.get_text()
+        # Find elements with classes 'text' and 'text-long' and extract all <p> tags
+        relevant_elements = soup.find_all(class_=['text', 'text-long'])
+        paragraphs = []
+
+        for element in relevant_elements:
+            # Extract text from <p> tags within the identified elements
+            paragraphs.extend(element.find_all('p'))
+
+        # Combine text from identified <p> tags
+        news_text = ' '.join([paragraph.get_text() for paragraph in paragraphs])
+
+        # Shorten the text to 100 words
+        shortened_text = ' '.join(news_text.split()[:100])
+
+        return jsonify({"news": shortened_text})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     
 if __name__ == "__main__":
     app.run()

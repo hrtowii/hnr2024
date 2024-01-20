@@ -73,8 +73,9 @@ class RSSDemoState extends State<RSSDemo> {
         forceWebView: false,
       );
       return;
+    } else {
+      updateTitle(feedOpenErrorMsg);
     }
-    updateTitle(feedOpenErrorMsg);
   }
 
   load() async {
@@ -191,65 +192,55 @@ class RSSDemoState extends State<RSSDemo> {
             trailing: rightIcon(),
             contentPadding: EdgeInsets.all(5.0),
             // onTap: () => openFeed(item.link!),
-            onTap: () => {
-                  // TODO: move this to RSSModal.dart
-                  showModalBottomSheet<void>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: SizedBox(
-                              height: 400,
-                              // color: Colors.amber,
-                              // child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  Align(
-                                      // aligns the text to top left
-                                      alignment: Alignment.topLeft,
-                                      child: Text(
-                                        item.title ?? "Title not found...",
-                                        style: const TextStyle(
-                                            fontSize: 17.0,
-                                            fontWeight: FontWeight.w500),
-                                        maxLines: 4,
-                                        overflow: TextOverflow.ellipsis,
-                                      )),
-                                  Text(
-                                    item.description!.isEmpty
-                                        ? TextDescription.fromJson(jsonDecode(
-                                                http.post(
-                                                    Uri.parse(
-                                                        'http://localhost:5000/scrape'),
-                                                    headers: <String, String>{
-                                                      'Content-Type':
-                                                          'application/json; charset=UTF-8',
-                                                    },
-                                                    body: jsonEncode(<String,
-                                                        String>{
-                                                      'url': item.link!,
-                                                    }))))
-                                            .title //TODO: await description from our API (localhost:5000/scrape with url as route.)
-                                        : item.description!,
+            onTap: () async {
+              TextDescription description =
+                  await TextDescription.createTextDescription(item.link!);
+              // TODO: move this to RSSModal.dart
+              showModalBottomSheet<void>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: SizedBox(
+                          height: 400,
+                          // color: Colors.amber,
+                          // child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.max,
+                            children: <Widget>[
+                              Align(
+                                  // aligns the text to top left
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    item.title ?? "Title not found...",
                                     style: const TextStyle(
-                                        fontSize: 12.0,
-                                        fontWeight: FontWeight.w300),
-                                    // overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const Spacer(),
-                                  ElevatedButton(
-                                    child: const Text('Close BottomSheet'),
-                                    onPressed: () => Navigator.pop(context),
-                                  ),
-                                ],
-                                // ),
+                                        fontSize: 17.0,
+                                        fontWeight: FontWeight.w500),
+                                    maxLines: 4,
+                                    overflow: TextOverflow.ellipsis,
+                                  )),
+                              Text(
+                                description.news.isEmpty
+                                    ? 'Fucks sake'
+                                    : description.news,
+                                style: const TextStyle(
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.w300),
+                                // overflow: TextOverflow.ellipsis,
                               ),
-                            ));
-                      })
-                });
+                              const Spacer(),
+                              ElevatedButton(
+                                child: const Text('Close BottomSheet'),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                            ],
+                            // ),
+                          ),
+                        ));
+                  });
+            });
       },
     );
   }
@@ -282,22 +273,43 @@ class RSSDemoState extends State<RSSDemo> {
 }
 
 class TextDescription {
-  final int id;
-  final String title;
+  final String news;
 
-  const TextDescription({required this.id, required this.title});
+  const TextDescription({required this.news});
 
   factory TextDescription.fromJson(Map<String, dynamic> json) {
     return switch (json) {
       {
-        'id': int id,
-        'title': String title,
+        'news': String news,
       } =>
         TextDescription(
-          id: id,
-          title: title,
-        ),
+            // id: id,
+            // title: title,
+            news: news),
       _ => throw const FormatException('Failed to load textdescription.'),
     };
+  }
+  static Future<TextDescription> createTextDescription(String url) async {
+    final response = await http.post(
+      Uri.parse('http://localhost:5000/scrape'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'url': url,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // If the server did return a 201 CREATED response,
+      // then parse the JSON.
+      print((TextDescription.fromJson(jsonDecode(response.body))));
+      return TextDescription.fromJson(
+          jsonDecode(response.body) as Map<String, dynamic>);
+    } else {
+      // If the server did not return a 201 CREATED response,
+      // then throw an exception.
+      throw Exception('Failed to create text description.');
+    }
   }
 }
