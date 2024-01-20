@@ -85,6 +85,7 @@ def scrape():
             paragraphs.extend(element.find_all('p')) # extract all <p> tags, then add the first 100 words to a list and return that.
         news_text = ' '.join([paragraph.get_text() for paragraph in paragraphs])
         shortened_text = ' '.join(news_text.split()[:100])
+        shortened_text += "... Continued in article"
 
         return jsonify({"news": shortened_text})
 

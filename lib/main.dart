@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hnr2024/RSSFeed.dart';
 import 'package:hnr2024/settings.dart';
-import 'package:webfeed/webfeed.dart';
-import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
 import 'bloc/bloc.dart';
 
 void main() {

@@ -189,18 +189,11 @@ class RSSDemoState extends State<RSSDemo> {
               children: <TextSpan>[
                 TextSpan(
                   text: "\n${emoji + sentiment.label.toLowerCase()}" +
-                      "\n${(sentiment.score.toDouble() * 100).toStringAsFixed(2)}% Confidence",
+                      ", ${(sentiment.score.toDouble() * 100).toStringAsFixed(2)}% sure",
                   style: TextStyle(
                     color: textColor,
                   ),
                 ),
-                // TextSpan(
-                //   text:
-                //       "\n${(sentiment.score.toDouble() * 100).toStringAsFixed(2)}% Confidence)}",
-                //   style: TextStyle(
-                //     color: textColor,
-                //   ),
-                // ),
               ],
             ),
             maxLines: 2,
