@@ -3,6 +3,7 @@ import 'package:webfeed/webfeed.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:developer';
 
 class RSSDemo extends StatefulWidget {
   //
@@ -18,8 +19,10 @@ class RSSDemoState extends State<RSSDemo> {
   //
   // static const String FEED_URL =
   //     'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss';
-  final Uri FEED_URL =
-      Uri.https('nasa.gov', 'rss/dyn/lg_image_of_the_day.rss', {'limit': '10'});
+  // final Uri FEED_URL =
+  //     Uri.https('nasa.gov', 'rss/dyn/lg_image_of_the_day.rss', {'limit': '10'});
+  final Uri FEED_URL = Uri.https('nyaa.si', 'page?=rss', {'limit': '10'});
+  // Uri.https('reddit.com', 'r/jailbreak.rss', {'limit': '10'});
   RssFeed _feed = RssFeed();
   String _title = "";
   static const String loadingFeedMsg = 'Loading Feed...';
@@ -30,6 +33,9 @@ class RSSDemoState extends State<RSSDemo> {
 
   updateTitle(title) {
     setState(() {
+      if (_title == null) {
+        _title = "Not found";
+      }
       _title = title;
     });
   }
@@ -68,8 +74,10 @@ class RSSDemoState extends State<RSSDemo> {
     try {
       final client = http.Client();
       final response = await client.get(FEED_URL as Uri);
-      print(RssFeed.parse(response.body));
-      return RssFeed.parse(response.body);
+      // print(RssFeed.parse(response.body));
+      final object = RssFeed.parse(response.body);
+      inspect(object);
+      return object;
     } catch (e) {
       print(e);
       return RssFeed();
@@ -85,6 +93,9 @@ class RSSDemoState extends State<RSSDemo> {
   }
 
   title(title) {
+    if (title == null) {
+      return Text("Title not found");
+    }
     return Text(
       title,
       style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
@@ -95,7 +106,7 @@ class RSSDemoState extends State<RSSDemo> {
 
   subtitle(subTitle) {
     if (subTitle == null) {
-      return Text("Null string...");
+      return Text("Subtitle not found");
     }
     return Text(
       subTitle,
