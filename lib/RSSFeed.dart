@@ -181,7 +181,7 @@ class RSSDemoState extends State<RSSDemo> {
           leading: thumbnail(_feed.image?.url),
           trailing: rightIcon(),
           contentPadding: EdgeInsets.all(5.0),
-          // onTap: () => openFeed(item.link),
+          onTap: () => openFeed(item.link!),
         );
       },
     );
