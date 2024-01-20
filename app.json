@@ -11,6 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "scheme": "com.htrowii.hnr2024",
     "assetBundlePatterns": [
       "**/*"
     ],
