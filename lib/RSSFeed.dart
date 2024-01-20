@@ -163,15 +163,18 @@ class RSSDemoState extends State<RSSDemo> {
         } else {
           Rating sentiment = snapshot.data!;
           Color textColor;
-
+          var emoji = "";
           switch (sentiment.label) {
             case "POSITIVE":
+              emoji = "🥰";
               textColor = Colors.green;
               break;
             case "NEGATIVE":
+              emoji = "😭";
               textColor = Colors.red;
               break;
             default:
+              emoji = "😐";
               textColor = Colors.black;
           }
           return RichText(
@@ -185,11 +188,19 @@ class RSSDemoState extends State<RSSDemo> {
               ),
               children: <TextSpan>[
                 TextSpan(
-                  text: "\n${sentiment.label.toLowerCase()}",
+                  text: "\n${emoji + sentiment.label.toLowerCase()}" +
+                      "\n${(sentiment.score.toDouble() * 100).toStringAsFixed(2)}% Confidence",
                   style: TextStyle(
-                    color: textColor, // Use the color based on sentiment label
+                    color: textColor,
                   ),
                 ),
+                // TextSpan(
+                //   text:
+                //       "\n${(sentiment.score.toDouble() * 100).toStringAsFixed(2)}% Confidence)}",
+                //   style: TextStyle(
+                //     color: textColor,
+                //   ),
+                // ),
               ],
             ),
             maxLines: 2,
