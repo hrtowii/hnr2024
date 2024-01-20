@@ -140,95 +140,48 @@ class RSSDemoState extends State<RSSDemo> {
   //     overflow: TextOverflow.ellipsis,
   //   );
   // }
-  date(DateTime date, RssItem item) {
-    Future<dynamic> fetchSentiments() async {
-      try {
-        var realdescription =
-            await TextDescription.createTextDescription(item.link!);
-        return await Rating.getRating(realdescription.news);
-      } catch (error) {
-        // Handle the error as needed
-        print("Error loading description: $error");
-        return TextDescription(news: "Error loading description");
-      }
+  date(DateTime date, RssItem item, Rating sentiment) {
+    Color textColor;
+    var emoji = "";
+    switch (sentiment.label) {
+      case "POSITIVE":
+        emoji = "🥰";
+        textColor = Colors.green;
+        break;
+      case "NEGATIVE":
+        emoji = "😭";
+        textColor = Colors.red;
+        break;
+      default:
+        emoji = "😐";
+        textColor = Colors.black;
     }
-
-    return FutureBuilder<dynamic>(
-      future: fetchSentiments(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Text("Loading..."); // or a loading indicator
-        } else if (snapshot.hasError) {
-          return const Text("Error loading sentiment analysis");
-        } else {
-          Rating sentiment = snapshot.data!;
-          Color textColor;
-          var emoji = "";
-          switch (sentiment.label) {
-            case "POSITIVE":
-              emoji = "🥰";
-              textColor = Colors.green;
-              break;
-            case "NEGATIVE":
-              emoji = "😭";
-              textColor = Colors.red;
-              break;
-            default:
-              emoji = "😐";
-              textColor = Colors.black;
-          }
-          if (true &&
-              sentiment.score <= 0.85 &&
-              sentiment.label.toLowerCase() != "negative") {
-            return RichText(
-              text: TextSpan(
-                text: DateFormat("dd/MM hh:mm ").format(date),
-                style: TextStyle(
-                  fontSize: 13.0,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.black,
-                ),
-                children: <TextSpan>[
-                  TextSpan(
-                    text: "\n${emoji + sentiment.label.toLowerCase()}" +
-                        ", ${(sentiment.score.toDouble() * 100).toStringAsFixed(2)}% sure",
-                    style: TextStyle(
-                      color: textColor,
-                    ),
-                  ),
-                ],
+    if (sentiment.score <= 0.85 &&
+        sentiment.label.toLowerCase() != "negative") {
+      return RichText(
+        text: TextSpan(
+          text: DateFormat("dd/MM hh:mm ").format(date),
+          style: TextStyle(
+            fontSize: 13.0,
+            fontWeight: FontWeight.w400,
+            color: Colors.black,
+          ),
+          children: <TextSpan>[
+            TextSpan(
+              text: "\n${emoji + sentiment.label.toLowerCase()}" +
+                  ", ${(sentiment.score.toDouble() * 100).toStringAsFixed(2)}% sure",
+              style: TextStyle(
+                color: textColor,
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            );
-          } else {
-            return Container();
-          }
-          // return RichText(
-          //   // thanks to chatGPT for telling me RichText and TextSpan exists, thanks flutter docs <3 https://api.flutter.dev/flutter/widgets/RichText-class.html
-          //   text: TextSpan(
-          //     text: DateFormat("dd/MM hh:mm ").format(date),
-          //     style: TextStyle(
-          //       fontSize: 13.0,
-          //       fontWeight: FontWeight.w400,
-          //       color: Colors.black,
-          //     ),
-          //     children: <TextSpan>[
-          //       TextSpan(
-          //         text: "\n${emoji + sentiment.label.toLowerCase()}" +
-          //             ", ${(sentiment.score.toDouble() * 100).toStringAsFixed(2)}% sure",
-          //         style: TextStyle(
-          //           color: textColor,
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          //   maxLines: 2,
-          //   overflow: TextOverflow.ellipsis,
-          // );
-        }
-      },
-    );
+            ),
+          ],
+        ),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      );
+    } else {
+      return Container();
+    }
   }
 
   thumbnail(imageUrl) {
@@ -293,7 +246,7 @@ class RSSDemoState extends State<RSSDemo> {
               future: fetchSentiments(item),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Text("Loading..."); // or a loading indicator
+                  return Container(); // or a loading indicator
                 } else if (snapshot.hasError) {
                   return Text(
                       'Error loading sentiment analysis: ${snapshot.error}');
@@ -303,8 +256,8 @@ class RSSDemoState extends State<RSSDemo> {
                       sentiment.label.toLowerCase() != "negative") {
                     return ListTile(
                         title: title(item.title),
-                        subtitle: date(item.pubDate!,
-                            item), // TODO: add a sentiment analysis call to the api, assigning an image / color coded text
+                        subtitle: date(item.pubDate!, item,
+                            sentiment), // TODO: add a sentiment analysis call to the api, assigning an image / color coded text
                         leading: thumbnail(item.media!.thumbnails!.first
                             .url), // wtf man... why is this like this...
                         trailing: rightIcon(),
