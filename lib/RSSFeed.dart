@@ -1,9 +1,21 @@
+import 'dart:io';
+import 'package:xml/xml.dart';
 import 'package:flutter/material.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:developer';
+
+void printXmlElement(XmlElement element, [String indent = '']) {
+  print('$indent${element.name}: ${element.text.trim()}');
+
+  for (var child in element.children) {
+    if (child is XmlElement) {
+      printXmlElement(child, '$indent  ');
+    }
+  }
+}
 
 class RSSDemo extends StatefulWidget {
   //
@@ -33,10 +45,10 @@ class RSSDemoState extends State<RSSDemo> {
 
   updateTitle(title) {
     setState(() {
-      if (_title == null) {
+      if (_title != String) {
         _title = "Not found";
       }
-      _title = title;
+      _title = "title";
     });
   }
 
@@ -76,7 +88,13 @@ class RSSDemoState extends State<RSSDemo> {
       final response = await client.get(FEED_URL as Uri);
       // print(RssFeed.parse(response.body));
       final object = RssFeed.parse(response.body);
-      inspect(object);
+      if (response.statusCode == 200) {
+        final object = XmlDocument.parse(response.body);
+        printXmlElement(object.rootElement!);
+      } else {
+        print('Failed to fetch data: ${response.statusCode}');
+      }
+      // sleep(Duration(seconds: 2));
       return object;
     } catch (e) {
       print(e);
