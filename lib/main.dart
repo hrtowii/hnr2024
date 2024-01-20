@@ -4,6 +4,34 @@ void main() {
   runApp(const MyApp());
 }
 
+class Destination {
+  const Destination(this.index, this.title, this.icon, this.color);
+  final int index;
+  final String title;
+  final IconData icon;
+  final MaterialColor color;
+}
+
+class RootPage extends StatelessWidget {
+  const RootPage({super.key, required this.destination});
+
+  final Destination destination;
+
+  Widget _buildDialog(BuildContext context) {
+    return AlertDialog(
+      title: Text('${destination.title} AlertDialog'),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('OK'),
+        ),
+      ],
+    );
+  }
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -111,6 +139,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton(
               onPressed: () {
                 print('button pressed!');
+                showDialog<void>(
+                  context: context,
+                  useRootNavigator: false,
+                  builder: _buildDialog,
+                );
               },
               child: Text('Next'),
             ),
