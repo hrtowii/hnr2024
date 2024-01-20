@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:http/http.dart' as http;
@@ -17,12 +19,11 @@ class RSSDemo extends StatefulWidget {
 }
 
 class RSSDemoState extends State<RSSDemo> {
-  //
-  // static const String FEED_URL =
-  //     'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss';
   // final Uri FEED_URL =
   //     Uri.https('nasa.gov', 'rss/dyn/lg_image_of_the_day.rss', {'limit': '10'});
-  final Uri FEED_URL = Uri.https('nyaa.si', 'page?=rss', {'limit': '10'});
+  // https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6511
+  final Uri FEED_URL = Uri.https('channelnewsasia.com',
+      'api/v1/rss-outbound-feed?_format=xml&category=6511', {'limit': '10'});
   // Uri.https('reddit.com', 'r/jailbreak.rss', {'limit': '10'});
   RssFeed _feed = RssFeed();
   String _title = "";
@@ -78,6 +79,7 @@ class RSSDemoState extends State<RSSDemo> {
       // print(RssFeed.parse(response.body));
       final object = RssFeed.parse(response.body);
       inspect(object);
+      sleep(Duration(seconds: 2));
       return object;
     } catch (e) {
       print(e);
@@ -106,7 +108,8 @@ class RSSDemoState extends State<RSSDemo> {
   }
 
   subtitle(subTitle) {
-    if (subTitle == null) {
+    if (subTitle != String) {
+      // print(subTitle);
       return Text("Subtitle not found");
     }
       print(subTitle);
@@ -123,17 +126,31 @@ class RSSDemoState extends State<RSSDemo> {
   }
 
   thumbnail(imageUrl) {
-    return Padding(
-      padding: EdgeInsets.only(left: 15.0),
-      child: CachedNetworkImage(
-        placeholder: (context, url) => Image.network(placeholderImg),
-        imageUrl: imageUrl,
-        height: 50,
-        width: 70,
-        alignment: Alignment.center,
-        fit: BoxFit.fill,
-      ),
-    );
+    if (imageUrl == null) {
+      return Padding(
+        padding: EdgeInsets.only(left: 15.0),
+        child: CachedNetworkImage(
+          placeholder: (context, url) => Image.network(placeholderImg),
+          imageUrl: imageUrl,
+          height: 50,
+          width: 70,
+          alignment: Alignment.center,
+          fit: BoxFit.fill,
+        ),
+      );
+    } else {
+      return Padding(
+        padding: EdgeInsets.only(left: 15.0),
+        child: CachedNetworkImage(
+          placeholder: (context, url) => Image.network(placeholderImg),
+          imageUrl: imageUrl,
+          height: 50,
+          width: 70,
+          alignment: Alignment.center,
+          fit: BoxFit.fill,
+        ),
+      );
+    }
   }
 
   getScoring(String input) {
@@ -164,10 +181,10 @@ class RSSDemoState extends State<RSSDemo> {
         return ListTile(
           title: title(item.title),
           subtitle: subtitle(item.pubDate),
-          leading: thumbnail(item.enclosure?.url),
-          trailing: rightIcon(),
+          // leading: thumbnail(item.enclosure?.url),
+          // trailing: rightIcon(),
           contentPadding: EdgeInsets.all(5.0),
-          // onTap: () => openFeed(item.link),
+          onTap: () => openFeed(item.link!),
         );
       },
     );
