@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline
 from scipy.special import softmax
+from urllib.parse import urlparse
+import urllib.request
+from bs4 import BeautifulSoup
 
-
-# setting up my ai magic
 MODEL = f"cardiffnlp/twitter-roberta-base-sentiment"
 tokenizer = AutoTokenizer.from_pretrained(MODEL)
 model = AutoModelForSequenceClassification.from_pretrained(MODEL)
@@ -42,5 +43,22 @@ def analyse():
     label, score = score[0]['label'], score[0]['score']
     return jsonify({ "label" : label, "score" : score })
 
+app.route('/scrape', methods=["POST"])
+def scrape():
+    if not request.is_json:
+        return jsonify({"error": "Request must be JSON"}), 400
+
+    data = request.json
+    url = data.get("url")
+    if not url or not urlparse(url):
+        return jsonify({"error": "Not valid URL"}), 400
+
+    page = urllib.request.urlopen(data["url"])
+    bbytes = page.read()
+
+    soup = BeautifulSoup(bbytes.decode("utf8"), "html.parser")
+
+    return soup.get_text()
+    
 if __name__ == "__main__":
     app.run()
