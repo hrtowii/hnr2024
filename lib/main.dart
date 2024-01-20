@@ -12,29 +12,8 @@ class Destination {
   final MaterialColor color;
 }
 
-class RootPage extends StatelessWidget {
-  const RootPage({super.key, required this.destination});
-
-  final Destination destination;
-
-  Widget _buildDialog(BuildContext context) {
-    return AlertDialog(
-      title: Text('${destination.title} AlertDialog'),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('OK'),
-        ),
-      ],
-    );
-  }
-}
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -59,6 +38,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Widget _buildDialog(BuildContext context) {
+    return AlertDialog(
+      title: Text('AlertDialog'),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('OK'),
+        ),
+      ],
+    );
+  }
+
   int _counter = 0;
   int currentPageIndex = 0;
   NavigationDestinationLabelBehavior labelBehavior =
