@@ -7,7 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:developer';
 
-void printXmlElement(XmlElement element, [String indent = '']) {
+void printXmlElement(XmlElement element, [String indent = '  ']) {
   print('$indent${element.name}: ${element.text.trim()}');
 
   for (var child in element.children) {
@@ -135,17 +135,31 @@ class RSSDemoState extends State<RSSDemo> {
   }
 
   thumbnail(imageUrl) {
-    return Padding(
-      padding: EdgeInsets.only(left: 15.0),
-      child: CachedNetworkImage(
-        placeholder: (context, url) => Image.network(placeholderImg),
-        imageUrl: imageUrl,
-        height: 50,
-        width: 70,
-        alignment: Alignment.center,
-        fit: BoxFit.fill,
-      ),
-    );
+    if (imageUrl == null) {
+      return Padding(
+        padding: EdgeInsets.only(left: 15.0),
+        child: CachedNetworkImage(
+          placeholder: (context, url) => Image.network(placeholderImg),
+          imageUrl: placeholderImg,
+          height: 50,
+          width: 70,
+          alignment: Alignment.center,
+          fit: BoxFit.fill,
+        ),
+      );
+    } else {
+      return Padding(
+        padding: EdgeInsets.only(left: 15.0),
+        child: CachedNetworkImage(
+          placeholder: (context, url) => Image.network(placeholderImg),
+          imageUrl: imageUrl,
+          height: 50,
+          width: 70,
+          alignment: Alignment.center,
+          fit: BoxFit.fill,
+        ),
+      );
+    }
   }
 
   rightIcon() {
@@ -163,8 +177,8 @@ class RSSDemoState extends State<RSSDemo> {
         final item = _feed.items![index];
         return ListTile(
           title: title(item.title),
-          subtitle: subtitle(item.pubDate),
-          leading: thumbnail(item.enclosure?.url),
+          subtitle: subtitle(_feed.description),
+          leading: thumbnail(_feed.image?.url),
           trailing: rightIcon(),
           contentPadding: EdgeInsets.all(5.0),
           // onTap: () => openFeed(item.link),
