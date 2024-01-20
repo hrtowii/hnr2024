@@ -16,8 +16,10 @@ class RSSDemo extends StatefulWidget {
 
 class RSSDemoState extends State<RSSDemo> {
   //
-  static const String FEED_URL =
-      'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss';
+  // static const String FEED_URL =
+  //     'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss';
+  final Uri FEED_URL =
+      Uri.https('nasa.gov', 'rss/dyn/lg_image_of_the_day.rss', {'limit': '10'});
   RssFeed _feed = RssFeed();
   String _title = "";
   static const String loadingFeedMsg = 'Loading Feed...';
@@ -66,11 +68,12 @@ class RSSDemoState extends State<RSSDemo> {
     try {
       final client = http.Client();
       final response = await client.get(FEED_URL as Uri);
+      print(RssFeed.parse(response.body));
       return RssFeed.parse(response.body);
     } catch (e) {
-      //
+      print(e);
+      return RssFeed();
     }
-    return null;
   }
 
   @override
@@ -91,6 +94,9 @@ class RSSDemoState extends State<RSSDemo> {
   }
 
   subtitle(subTitle) {
+    if (subTitle == null) {
+      return "Null string...";
+    }
     return Text(
       subTitle,
       style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w100),
