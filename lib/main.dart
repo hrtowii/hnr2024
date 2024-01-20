@@ -146,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           // 2nd Page
-          RSSReader(),
+          RSSDemo(),
         ][currentPageIndex]);
   }
 }
