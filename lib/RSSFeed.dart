@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:intl/intl.dart';
+import 'package:webfeed/domain/media/description.dart';
 import 'package:xml/xml.dart';
 import 'package:flutter/material.dart';
 import 'package:webfeed/webfeed.dart';
@@ -117,19 +119,20 @@ class RSSDemoState extends State<RSSDemo> {
     }
     return Text(
       title,
-      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
+      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
     );
   }
 
-  subtitle(subTitle) {
-    if (subTitle != String) {
-      return Text("Subtitle not found");
-    }
+  Description(description) {
+    // if (description != String) {
+    //   return Text("Subtitle not found");
+    // }
     return Text(
-      subTitle,
-      style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w100),
+      // description,
+      DateFormat("yyyy-MM-dd hh:mm:ss").format(description),
+      style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.w400),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );
@@ -142,8 +145,8 @@ class RSSDemoState extends State<RSSDemo> {
         child: CachedNetworkImage(
           placeholder: (context, url) => Image.network(placeholderImg),
           imageUrl: placeholderImg,
-          height: 50,
-          width: 70,
+          height: 100,
+          width: 90,
           alignment: Alignment.center,
           fit: BoxFit.fill,
         ),
@@ -154,8 +157,8 @@ class RSSDemoState extends State<RSSDemo> {
         child: CachedNetworkImage(
           placeholder: (context, url) => Image.network(placeholderImg),
           imageUrl: imageUrl,
-          height: 50,
-          width: 70,
+          height: 100,
+          width: 90,
           alignment: Alignment.center,
           fit: BoxFit.fill,
         ),
@@ -178,7 +181,7 @@ class RSSDemoState extends State<RSSDemo> {
         final item = _feed.items![index];
         return ListTile(
           title: title(item.title),
-          subtitle: subtitle(item.description),
+          subtitle: Description(item.pubDate),
           leading: thumbnail(item.media!.thumbnails!.first
               .url), // wtf man... why is this like this...
           trailing: rightIcon(),
