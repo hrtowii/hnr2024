@@ -1071,6 +1071,10 @@ PODS:
     - React-logger (= 0.73.2)
     - React-perflogger (= 0.73.2)
   - SocketRocket (0.6.1)
+  - ViroKit (1.0):
+    - React
+  - ViroReact (1.0):
+    - React
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -1130,6 +1134,8 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "ViroKit (from `../node_modules/@viro-community/react-viro/ios/dist/ViroRenderer/`)"
+  - "ViroReact (from `../node_modules/@viro-community/react-viro/ios`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -1246,6 +1252,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  ViroKit:
+    :path: "../node_modules/@viro-community/react-viro/ios/dist/ViroRenderer/"
+  ViroReact:
+    :path: "../node_modules/@viro-community/react-viro/ios"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -1306,8 +1316,10 @@ SPEC CHECKSUMS:
   React-utils: f5bc61e7ea3325c0732ae2d755f4441940163b85
   ReactCommon: 45b5d4f784e869c44a6f5a8fad5b114ca8f78c53
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
+  ViroKit: 700d3d4ca086368d06224de1cbbc19781aea2094
+  ViroReact: f4980e6b04918c4340637f9cbaae22a6bb7ea440
   Yoga: e64aa65de36c0832d04e8c7bd614396c77a80047
 
-PODFILE CHECKSUM: 58d5f1e1027e1a0d9473a63ec6a571492815c0fe
+PODFILE CHECKSUM: b58ff3aa6e99686ddade38b7bc12f0667874f7c3
 
 COCOAPODS: 1.12.0
