@@ -365,8 +365,10 @@ class RSSDemoState extends State<RSSDemo> {
                               ));
                         });
                   });
+              }
         }
-      },
+        });
+      }
     );
   }
 
