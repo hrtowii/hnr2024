@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:developer';
+import 'dart:convert';
 
 class RSSDemo extends StatefulWidget {
   //
@@ -108,6 +109,11 @@ class RSSDemoState extends State<RSSDemo> {
     if (subTitle == null) {
       return Text("Subtitle not found");
     }
+      print(subTitle);
+
+      Future<http.Response> res = getScoring(subTitle);
+
+      print(res);
     return Text(
       subTitle,
       style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w100),
@@ -127,6 +133,18 @@ class RSSDemoState extends State<RSSDemo> {
         alignment: Alignment.center,
         fit: BoxFit.fill,
       ),
+    );
+  }
+
+  getScoring(String input) {
+    return http.post(
+      Uri.parse('http://127.0.0.1:5000/analyse'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8'
+      },
+      body: jsonEncode(<String, String>{
+        'text' : input
+      })
     );
   }
 
