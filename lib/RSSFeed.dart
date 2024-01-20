@@ -1,10 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:developer';
-import 'dart:convert';
 
 class RSSDemo extends StatefulWidget {
   //
@@ -17,12 +18,11 @@ class RSSDemo extends StatefulWidget {
 }
 
 class RSSDemoState extends State<RSSDemo> {
-  //
-  // static const String FEED_URL =
-  //     'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss';
   // final Uri FEED_URL =
   //     Uri.https('nasa.gov', 'rss/dyn/lg_image_of_the_day.rss', {'limit': '10'});
-  final Uri FEED_URL = Uri.https('nyaa.si', 'page?=rss', {'limit': '10'});
+  // https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6511
+  final Uri FEED_URL = Uri.https('channelnewsasia.com',
+      'api/v1/rss-outbound-feed?_format=xml&category=6511', {'limit': '10'});
   // Uri.https('reddit.com', 'r/jailbreak.rss', {'limit': '10'});
   RssFeed _feed = RssFeed();
   String _title = "";
@@ -78,6 +78,7 @@ class RSSDemoState extends State<RSSDemo> {
       // print(RssFeed.parse(response.body));
       final object = RssFeed.parse(response.body);
       inspect(object);
+      sleep(Duration(seconds: 2));
       return object;
     } catch (e) {
       print(e);
@@ -106,14 +107,10 @@ class RSSDemoState extends State<RSSDemo> {
   }
 
   subtitle(subTitle) {
-    if (subTitle == null) {
+    if (subTitle != String) {
+      // print(subTitle);
       return Text("Subtitle not found");
     }
-      print(subTitle);
-
-      Future<http.Response> res = getScoring(subTitle);
-
-      print(res);
     return Text(
       subTitle,
       style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w100),
@@ -123,29 +120,31 @@ class RSSDemoState extends State<RSSDemo> {
   }
 
   thumbnail(imageUrl) {
-    return Padding(
-      padding: EdgeInsets.only(left: 15.0),
-      child: CachedNetworkImage(
-        placeholder: (context, url) => Image.network(placeholderImg),
-        imageUrl: imageUrl,
-        height: 50,
-        width: 70,
-        alignment: Alignment.center,
-        fit: BoxFit.fill,
-      ),
-    );
-  }
-
-  getScoring(String input) {
-    return http.post(
-      Uri.parse('http://127.0.0.1:5000/analyse'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
-      body: jsonEncode(<String, String>{
-        'text' : input
-      })
-    );
+    if (imageUrl == null) {
+      return Padding(
+        padding: EdgeInsets.only(left: 15.0),
+        child: CachedNetworkImage(
+          placeholder: (context, url) => Image.network(placeholderImg),
+          imageUrl: imageUrl,
+          height: 50,
+          width: 70,
+          alignment: Alignment.center,
+          fit: BoxFit.fill,
+        ),
+      );
+    } else {
+      return Padding(
+        padding: EdgeInsets.only(left: 15.0),
+        child: CachedNetworkImage(
+          placeholder: (context, url) => Image.network(placeholderImg),
+          imageUrl: imageUrl,
+          height: 50,
+          width: 70,
+          alignment: Alignment.center,
+          fit: BoxFit.fill,
+        ),
+      );
+    }
   }
 
   rightIcon() {
@@ -164,10 +163,10 @@ class RSSDemoState extends State<RSSDemo> {
         return ListTile(
           title: title(item.title),
           subtitle: subtitle(item.pubDate),
-          leading: thumbnail(item.enclosure?.url),
-          trailing: rightIcon(),
+          // leading: thumbnail(item.enclosure?.url),
+          // trailing: rightIcon(),
           contentPadding: EdgeInsets.all(5.0),
-          // onTap: () => openFeed(item.link),
+          onTap: () => openFeed(item.link!),
         );
       },
     );
