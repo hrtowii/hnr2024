@@ -34,10 +34,10 @@ class RSSDemoState extends State<RSSDemo> {
 
   updateTitle(title) {
     setState(() {
-      if (_title == null) {
+      if (_title != String) {
         _title = "Not found";
       }
-      _title = title;
+      _title = "title";
     });
   }
 
