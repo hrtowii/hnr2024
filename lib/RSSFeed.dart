@@ -1,4 +1,6 @@
 // import 'dart:io';
+// import 'dart:html';
+
 import 'package:intl/intl.dart';
 // import 'package:webfeed/domain/media/description.dart';
 import 'package:xml/xml.dart';
@@ -188,26 +190,40 @@ class RSSDemoState extends State<RSSDemo> {
             contentPadding: EdgeInsets.all(5.0),
             // onTap: () => openFeed(item.link!),
             onTap: () => {
+                  // TODO: move this to RSSModal.dart
                   showModalBottomSheet<void>(
                       context: context,
                       builder: (BuildContext context) {
-                        return Container(
-                          height: 200,
-                          // color: Colors.amber,
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                const Text('Modal BottomSheet'),
-                                ElevatedButton(
-                                  child: const Text('Close BottomSheet'),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
+                        return Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: SizedBox(
+                              height: 400,
+                              // color: Colors.amber,
+                              // child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Align(
+                                      // aligns the text to top left
+                                      alignment: Alignment.topLeft,
+                                      child: Text(
+                                        item.title!,
+                                        style: TextStyle(
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.w500),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      )),
+                                  ElevatedButton(
+                                    child: const Text('Close BottomSheet'),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                ],
+                                // ),
+                              ),
+                            ));
                       })
                 });
       },
