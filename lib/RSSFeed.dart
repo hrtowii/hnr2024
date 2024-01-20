@@ -127,19 +127,6 @@ class RSSDemoState extends State<RSSDemo> {
     );
   }
 
-  // date(DateTime date, RssItem item) {
-  //   TextDescription actualDescription =
-  //       TextDescription.createTextDescription(item.link!);
-  //   Rating sentimentAnalysis = Rating.getRating(actualDescription.news);
-  //   print(sentimentAnalysis.label);
-  //   return Text(
-  //     // description,
-  //     DateFormat("yyyy-MM-dd hh:mm:ss").format(date),
-  //     style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.w400),
-  //     maxLines: 1,
-  //     overflow: TextOverflow.ellipsis,
-  //   );
-  // }
   date(DateTime date, RssItem item, Rating sentiment) {
     Color textColor;
     var emoji = "";
@@ -233,16 +220,13 @@ class RSSDemoState extends State<RSSDemo> {
   }
 
   list(Map<String, Object> settings) {
-    // check whether the feed should load the article or not
-    // if (settings["sentimentalMinimum"]) {
-    //
-    // }
-
     return ListView.builder(
         itemCount: _feed.items?.length,
         itemBuilder: (BuildContext context, int index) {
           final item = _feed.items![index];
+          // if <insert preference> == true, return this. else, return the one without the if statement.
           return FutureBuilder<dynamic>(
+              // asynchronously fetch the stuff and pass it down to date separately without double calling it in Date
               future: fetchSentiments(item),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -256,8 +240,7 @@ class RSSDemoState extends State<RSSDemo> {
                       sentiment.label.toLowerCase() != "negative") {
                     return ListTile(
                         title: title(item.title),
-                        subtitle: date(item.pubDate!, item,
-                            sentiment), // TODO: add a sentiment analysis call to the api, assigning an image / color coded text
+                        subtitle: date(item.pubDate!, item, sentiment),
                         leading: thumbnail(item.media!.thumbnails!.first
                             .url), // wtf man... why is this like this...
                         trailing: rightIcon(),
