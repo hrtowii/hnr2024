@@ -203,19 +203,29 @@ class RSSDemoState extends State<RSSDemo> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
+                                mainAxisSize: MainAxisSize.max,
                                 children: <Widget>[
                                   Align(
                                       // aligns the text to top left
                                       alignment: Alignment.topLeft,
                                       child: Text(
-                                        item.title!,
-                                        style: TextStyle(
-                                            fontSize: 18.0,
+                                        item.title ?? "Title not found...",
+                                        style: const TextStyle(
+                                            fontSize: 17.0,
                                             fontWeight: FontWeight.w500),
-                                        maxLines: 2,
+                                        maxLines: 4,
                                         overflow: TextOverflow.ellipsis,
                                       )),
+                                  Text(
+                                    item.description!.isEmpty
+                                        ? "Description not found" //TODO: await description from our API (localhost:5000/scrape with url as route.)
+                                        : item.description!,
+                                    style: const TextStyle(
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.w300),
+                                    // overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const Spacer(),
                                   ElevatedButton(
                                     child: const Text('Close BottomSheet'),
                                     onPressed: () => Navigator.pop(context),
