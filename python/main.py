@@ -36,7 +36,6 @@ def analyse():
     if not text:
         return jsonify({"error": "No text provided"}), 400
 
-    print(data)
     text = data["text"]
 
     score = query_model(text)
@@ -63,20 +62,34 @@ def analyse_batch():
 
 @app.route('/scrape', methods=["POST"])
 def scrape():
+    headers = {'User-Agent': 'Mozilla/5.0'}
+
     if not request.is_json:
         return jsonify({"error": "Request must be JSON"}), 400
 
     data = request.json
     url = data.get("url")
+
     if not url or not urlparse(url):
         return jsonify({"error": "Not valid URL"}), 400
 
-    page = urllib.request.urlopen(data["url"])
-    bbytes = page.read()
+    try:
+        page = urllib.request.urlopen(url)
+        bbytes = page.read()
+        soup = BeautifulSoup(bbytes.decode("utf8"), "html.parser")
+        # check for elements containing text -> text-long nested beneath
+        relevant_elements = soup.find_all(class_=['text', 'text-long'])
+        paragraphs = []
 
-    soup = BeautifulSoup(bbytes.decode("utf8"), "html.parser")
+        for element in relevant_elements:
+            paragraphs.extend(element.find_all('p')) # extract all <p> tags, then add the first 100 words to a list and return that.
+        news_text = ' '.join([paragraph.get_text() for paragraph in paragraphs])
+        shortened_text = ' '.join(news_text.split()[:100])
 
-    return soup.get_text()
+        return jsonify({"news": shortened_text})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     
 if __name__ == "__main__":
     app.run()

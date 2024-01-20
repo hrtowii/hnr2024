@@ -73,8 +73,9 @@ class RSSDemoState extends State<RSSDemo> {
         forceWebView: false,
       );
       return;
+    } else {
+      updateTitle(feedOpenErrorMsg);
     }
-    updateTitle(feedOpenErrorMsg);
   }
 
   load() async {
@@ -130,9 +131,6 @@ class RSSDemoState extends State<RSSDemo> {
   }
 
   Description(description) {
-    // if (description != String) {
-    //   return Text("Subtitle not found");
-    // }
     return Text(
       // description,
       DateFormat("yyyy-MM-dd hh:mm:ss").format(description),
@@ -191,67 +189,56 @@ class RSSDemoState extends State<RSSDemo> {
             trailing: rightIcon(),
             contentPadding: EdgeInsets.all(5.0),
             // onTap: () => openFeed(item.link!),
-            onTap: () => {
-                  // TODO: move this to RSSModal.dart
-                  showModalBottomSheet<void>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: SizedBox(
-                              height: 400,
-                              // color: Colors.amber,
-                              // child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  Align(
-                                      // aligns the text to top left
-                                      alignment: Alignment.topLeft,
-                                      child: Text(
-                                        item.title ?? "Title not found...",
-                                        style: const TextStyle(
-                                            fontSize: 17.0,
-                                            fontWeight: FontWeight.w500),
-                                        maxLines: 4,
-                                        overflow: TextOverflow.ellipsis,
-                                      )),
-                                  Text(""
-                                    // item.description!.isEmpty
-                                    //     ? TextDescription.fromJson(jsonDecode(
-
-                                                // http.post(
-                                                //     Uri.parse(
-                                                //         'http://localhost:5000/scrape'),
-                                                //     headers: <String, String>{
-                                                //       'Content-Type':
-                                                //           'application/json; charset=UTF-8',
-                                                //     },
-                                                //     body: jsonEncode(<String,
-                                                //         String>{
-                                                //       'url': item.link!,
-                                                //     }))))
-                                            // .title //TODO: await description from our API (localhost:5000/scrape with url as route.)
-                                        // : item.description!,
-
-                                    // style: const TextStyle(
-                                    //     fontSize: 12.0,
-                                    //     fontWeight: FontWeight.w300),
-                                    // overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const Spacer(),
-                                  ElevatedButton(
-                                    child: const Text('Close BottomSheet'),
-                                    onPressed: () => Navigator.pop(context),
-                                  ),
-                                ],
-                                // ),
+            onTap: () async {
+              TextDescription description =
+                  await TextDescription.createTextDescription(item.link!);
+              // TODO: move this to RSSModal.dart
+              showModalBottomSheet<void>(
+                  // I have no idea how this thing fucking works, but this is from asking chatgpt and relying on flutter docs https://docs.flutter.dev/cookbook/networking/send-data
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: SizedBox(
+                          height: 400,
+                          // color: Colors.amber,
+                          // child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.max,
+                            children: <Widget>[
+                              Align(
+                                  // aligns the text to top left
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    item.title ?? "Title not found...",
+                                    style: const TextStyle(
+                                        fontSize: 17.0,
+                                        fontWeight: FontWeight.w500),
+                                    maxLines: 4,
+                                    overflow: TextOverflow.ellipsis,
+                                  )),
+                              Text(
+                                description.news.isEmpty
+                                    ? item
+                                        .description! // fallback to RSS feed one if the server is dead
+                                    : description.news,
+                                style: const TextStyle(
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.w300),
                               ),
-                            ));
-                      })
-                });
+                              const Spacer(),
+                              ElevatedButton(
+                                child: const Text('Close BottomSheet'),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                            ],
+                            // ),
+                          ),
+                        ));
+                  });
+            });
       },
     );
   }
@@ -284,22 +271,38 @@ class RSSDemoState extends State<RSSDemo> {
 }
 
 class TextDescription {
-  final int id;
-  final String title;
+  final String news;
 
-  const TextDescription({required this.id, required this.title});
+  const TextDescription({required this.news});
 
   factory TextDescription.fromJson(Map<String, dynamic> json) {
     return switch (json) {
       {
-        'id': int id,
-        'title': String title,
+        'news': String news,
       } =>
         TextDescription(
-          id: id,
-          title: title,
-        ),
+            // id: id,
+            // title: title,
+            news: news),
       _ => throw const FormatException('Failed to load textdescription.'),
     };
+  }
+  static Future<TextDescription> createTextDescription(String url) async {
+    final response = await http.post(
+      Uri.parse('http://localhost:5000/scrape'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'url': url,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return TextDescription.fromJson(jsonDecode(response.body)
+          as Map<String, dynamic>); // chatgpt I LOVE YOU SO MUCH
+    } else {
+      throw Exception('Failed to create text description.');
+    }
   }
 }
