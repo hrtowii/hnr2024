@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hnr2024/RSSFeed.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -17,7 +18,6 @@ class Destination {
 }
 
 class MyApp extends StatelessWidget {
-  // ctor, first widget
   const MyApp({super.key});
   // This widget is the root of your application.
   @override
@@ -34,32 +34,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  // building onto it
-  static const String FEED_URL =
-      'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss';
-  RssFeed _feed;
-  String _title;
-  final String loadingFeedMsg = 'Loading Feed...';
-  final String feedLoadErrorMsg = 'Error Loading Feed.';
-  final String feedOpenErrorMsg = 'Error Opening Feed.';
-  final String placeholderImg = 'images/no_image.png';
-  GlobalKey<RefreshIndicatorState> _refreshKey;
-  updateTitle(title) {
-    setState(() {
-      _title = title;
-    });
-  }
-
-  updateFeed(feed) {
-    setState(() {
-      _feed = feed;
-    });
-  }
-
   const MyHomePage({super.key, required this.title});
-
   final String title;
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -170,27 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           // 2nd Page
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Column(
-              children: <Widget>[
-                Card(
-                  child: ListTile(
-                    leading: Icon(Icons.notifications_sharp),
-                    title: Text('Notification 1'),
-                    subtitle: Text('This is a notification'),
-                  ),
-                ),
-                Card(
-                  child: ListTile(
-                    leading: Icon(Icons.notifications_sharp),
-                    title: Text('Notification 2'),
-                    subtitle: Text('This is a notification'),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          RSSDemo(),
         ][currentPageIndex]);
   }
 }
