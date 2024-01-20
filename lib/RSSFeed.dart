@@ -218,25 +218,27 @@ class RSSDemoState extends State<RSSDemo> {
                                         maxLines: 4,
                                         overflow: TextOverflow.ellipsis,
                                       )),
-                                  Text(
-                                    item.description!.isEmpty
-                                        ? TextDescription.fromJson(jsonDecode(
-                                                http.post(
-                                                    Uri.parse(
-                                                        'http://localhost:5000/scrape'),
-                                                    headers: <String, String>{
-                                                      'Content-Type':
-                                                          'application/json; charset=UTF-8',
-                                                    },
-                                                    body: jsonEncode(<String,
-                                                        String>{
-                                                      'url': item.link!,
-                                                    }))))
-                                            .title //TODO: await description from our API (localhost:5000/scrape with url as route.)
-                                        : item.description!,
-                                    style: const TextStyle(
-                                        fontSize: 12.0,
-                                        fontWeight: FontWeight.w300),
+                                  Text(""
+                                    // item.description!.isEmpty
+                                    //     ? TextDescription.fromJson(jsonDecode(
+
+                                                // http.post(
+                                                //     Uri.parse(
+                                                //         'http://localhost:5000/scrape'),
+                                                //     headers: <String, String>{
+                                                //       'Content-Type':
+                                                //           'application/json; charset=UTF-8',
+                                                //     },
+                                                //     body: jsonEncode(<String,
+                                                //         String>{
+                                                //       'url': item.link!,
+                                                //     }))))
+                                            // .title //TODO: await description from our API (localhost:5000/scrape with url as route.)
+                                        // : item.description!,
+
+                                    // style: const TextStyle(
+                                    //     fontSize: 12.0,
+                                    //     fontWeight: FontWeight.w300),
                                     // overflow: TextOverflow.ellipsis,
                                   ),
                                   const Spacer(),

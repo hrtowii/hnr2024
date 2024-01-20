@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hnr2024/RSSFeed.dart';
+import 'package:hnr2024/settings.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
+import 'bloc/bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,13 +26,19 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'RSSAi',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<SettingsBloc>(create: (context) => SettingsBloc()),
+        // Add other BlocProviders if needed
+      ],
+      child: MaterialApp(
+        title: 'RSSAi',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const MyHomePage(title: 'RSSAI'),
       ),
-      home: const MyHomePage(title: 'RSSAI'),
     );
   }
 }
@@ -100,6 +110,11 @@ class _MyHomePageState extends State<MyHomePage> {
             NavigationDestination(
               selectedIcon: Icon(Icons.app_settings_alt),
               icon: Icon(Icons.app_settings_alt),
+              label: 'RSS',
+            ),
+            NavigationDestination(
+              selectedIcon: Icon(Icons.app_settings_alt),
+              icon: Icon(Icons.app_settings_alt),
               label: 'Settings',
             ),
           ],
@@ -147,6 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           // 2nd Page
           RSSDemo(),
+          Settings()
         ][currentPageIndex]);
   }
 }
