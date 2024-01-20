@@ -1,5 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import {Redirect} from "expo-router";
+import React from 'react';
 
 export default function App() {
   return (
