@@ -25,7 +25,7 @@ class RSSDemoState extends State<RSSDemo> {
   static const String loadingFeedMsg = 'Loading Feed...';
   static const String feedLoadErrorMsg = 'Error Loading Feed.';
   static const String feedOpenErrorMsg = 'Error Opening Feed.';
-  static const String placeholderImg = 'images/no_image.png';
+  static const String placeholderImg = "https://placehold.co/600x400/png";
   late GlobalKey<RefreshIndicatorState> _refreshKey;
 
   updateTitle(title) {
@@ -95,7 +95,7 @@ class RSSDemoState extends State<RSSDemo> {
 
   subtitle(subTitle) {
     if (subTitle == null) {
-      return "Null string...";
+      return Text("Null string...");
     }
     return Text(
       subTitle,
@@ -109,7 +109,7 @@ class RSSDemoState extends State<RSSDemo> {
     return Padding(
       padding: EdgeInsets.only(left: 15.0),
       child: CachedNetworkImage(
-        placeholder: (context, url) => Image.asset(placeholderImg),
+        placeholder: (context, url) => Image.network(placeholderImg),
         imageUrl: imageUrl,
         height: 50,
         width: 70,
