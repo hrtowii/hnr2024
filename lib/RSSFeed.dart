@@ -4,33 +4,18 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:convert';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-// import 'package:webfeed/domain/media/description.dart';
-import 'package:xml/xml.dart';
 import 'package:flutter/material.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
 import 'bloc/bloc.dart';
-// import 'dart:developer';
-
-void printXmlElement(XmlElement element, [String indent = '  ']) {
-  print('$indent${element.name}: ${element.text.trim()}');
-
-  for (var child in element.children) {
-    if (child is XmlElement) {
-      printXmlElement(child, '$indent  ');
-    }
-  }
-}
 
 class RSSDemo extends StatefulWidget {
   //
-  RSSDemo() : super();
+  const RSSDemo() : super();
 
   final String title = 'RSS Feed Demo';
 
@@ -39,12 +24,7 @@ class RSSDemo extends StatefulWidget {
 }
 
 class RSSDemoState extends State<RSSDemo> {
-  //
-  // static const String FEED_URL =
-  //     'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss';
-  // final Uri FEED_URL =
-  //     Uri.https('nasa.gov', 'rss/dyn/lg_image_of_the_day.rss', {'limit': '10'});
-  // https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml&category=6511
+  // TODO: make FEED_URL changed via settings
   final Uri FEED_URL = Uri.https('channelnewsasia.com',
       'api/v1/rss-outbound-feed?_format=xml&category=6511', {'limit': '10'});
   RssFeed _feed = RssFeed();
@@ -98,11 +78,10 @@ class RSSDemoState extends State<RSSDemo> {
   Future<RssFeed?> loadFeed() async {
     try {
       final client = http.Client();
-      final response = await client.get(FEED_URL as Uri);
+      final response = await client.get(FEED_URL);
       final object = RssFeed.parse(response.body);
       return object;
     } catch (e) {
-      print(e);
       return RssFeed();
     }
   }
@@ -117,11 +96,11 @@ class RSSDemoState extends State<RSSDemo> {
 
   title(title) {
     if (title == null) {
-      return Text("Title not found");
+      return const Text("Title not found");
     }
     return Text(
       title,
-      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),
+      style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
     );
@@ -148,7 +127,7 @@ class RSSDemoState extends State<RSSDemo> {
       return RichText(
         text: TextSpan(
           text: DateFormat("dd/MM hh:mm ").format(date),
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 13.0,
             fontWeight: FontWeight.w400,
             color: Colors.black,
@@ -174,7 +153,7 @@ class RSSDemoState extends State<RSSDemo> {
   thumbnail(imageUrl) {
     if (imageUrl == null) {
       return Padding(
-        padding: EdgeInsets.only(left: 15.0),
+        padding: const EdgeInsets.only(left: 15.0),
         child: CachedNetworkImage(
           placeholder: (context, url) => Image.network(placeholderImg),
           imageUrl: placeholderImg,
@@ -186,7 +165,7 @@ class RSSDemoState extends State<RSSDemo> {
       );
     } else {
       return Padding(
-        padding: EdgeInsets.only(left: 15.0),
+        padding: const EdgeInsets.only(left: 15.0),
         child: CachedNetworkImage(
           placeholder: (context, url) => Image.network(placeholderImg),
           imageUrl: imageUrl,
@@ -200,7 +179,7 @@ class RSSDemoState extends State<RSSDemo> {
   }
 
   rightIcon() {
-    return Icon(
+    return const Icon(
       Icons.keyboard_arrow_right,
       color: Colors.grey,
       size: 30.0,
@@ -213,9 +192,7 @@ class RSSDemoState extends State<RSSDemo> {
           await TextDescription.createTextDescription(item.link!);
       return await Rating.getRating(realdescription.news);
     } catch (error) {
-      // Handle the error as needed
-      print("Error loading description: $error");
-      return TextDescription(news: "Error loading description");
+      return const TextDescription(news: "Error loading description");
     }
   }
 
@@ -244,7 +221,7 @@ class RSSDemoState extends State<RSSDemo> {
                         leading: thumbnail(item.media!.thumbnails!.first
                             .url), // wtf man... why is this like this...
                         trailing: rightIcon(),
-                        contentPadding: EdgeInsets.all(5.0),
+                        contentPadding: const EdgeInsets.all(5.0),
                         // onTap: () => openFeed(item.link!),
                         onTap: () async {
                           TextDescription description =
@@ -326,7 +303,7 @@ class RSSDemoState extends State<RSSDemo> {
 
   body(Map<String, Object> settings) {
     return isFeedEmpty()
-        ? Center(
+        ? const Center(
             child: CircularProgressIndicator(),
           )
         : RefreshIndicator(

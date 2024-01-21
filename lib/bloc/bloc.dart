@@ -1,6 +1,5 @@
 // Define events, state, and bloc
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart'; // Import meta for @immutable annotation
 
 abstract class SettingsEvent {}
 
